@@ -1,0 +1,37 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "com.limonnana.skate"
+    },
+    "jhipsterVersion": "6.10.5",
+    "applicationType": "monolith",
+    "baseName": "skate03",
+    "packageName": "com.limonnana.skate",
+    "packageFolder": "com/limonnana/skate",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "no",
+    "enableHibernateCache": false,
+    "websocket": false,
+    "databaseType": "mongodb",
+    "devDatabaseType": "mongodb",
+    "prodDatabaseType": "mongodb",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "OTNkNDZiNmQ5ZmQwMzlmYTYyZTJkZjk4MTM0NzEyYzI4ZThhNGFiYzA2NTY3NjVkM2Y3NDVjYzFiZmU4Y2ZmNTM5YjIxODg5MjNjNGZlZjRjOTY0OWUwM2Y1MDgyYjljYmExNzAxMDkzNjI1MjViNmJiYmExOTdmMGNlYzJiMmQ=",
+    "embeddableLaunchScript": false,
+    "creationTimestamp": 1611052328056,
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": false,
+    "clientPackageManager": "npm",
+    "blueprints": [],
+    "skipClient": true
+  }
+}
