@@ -1,0 +1,42 @@
+{
+  "fluentMethods": true,
+  "clientRootFolder": "",
+  "relationships": [
+    {
+      "relationshipName": "trick",
+      "otherEntityName": "trick",
+      "relationshipType": "one-to-many",
+      "otherEntityRelationshipName": "event"
+    },
+    {
+      "relationshipName": "player",
+      "otherEntityName": "player",
+      "relationshipType": "one-to-many",
+      "otherEntityRelationshipName": "event"
+    },
+    {
+      "relationshipName": "fan",
+      "otherEntityName": "fan",
+      "relationshipType": "one-to-many",
+      "otherEntityRelationshipName": "event"
+    }
+  ],
+  "fields": [
+    {
+      "fieldName": "day",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "dayString",
+      "fieldType": "String"
+    }
+  ],
+  "dto": "no",
+  "searchEngine": false,
+  "service": "no",
+  "entityTableName": "event",
+  "databaseType": "mongodb",
+  "readOnly": false,
+  "jpaMetamodelFiltering": false,
+  "pagination": "no"
+}

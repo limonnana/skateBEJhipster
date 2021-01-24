@@ -1,0 +1,28 @@
+{
+  "fluentMethods": true,
+  "clientRootFolder": "",
+  "relationships": [],
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "objectiveAmount",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "currentAmount",
+      "fieldType": "Integer"
+    }
+  ],
+  "dto": "no",
+  "searchEngine": false,
+  "service": "no",
+  "entityTableName": "trick",
+  "databaseType": "mongodb",
+  "readOnly": false,
+  "jpaMetamodelFiltering": false,
+  "pagination": "infinite-scroll"
+}
