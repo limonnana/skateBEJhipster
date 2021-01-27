@@ -1,7 +1,10 @@
 package com.limonnana.skate.web.rest;
 
+import com.limonnana.skate.domain.AddTrick;
 import com.limonnana.skate.domain.Event;
+import com.limonnana.skate.domain.Trick;
 import com.limonnana.skate.repository.EventRepository;
+import com.limonnana.skate.repository.TrickRepository;
 import com.limonnana.skate.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -13,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -33,9 +37,12 @@ public class EventResource {
     private String applicationName;
 
     private final EventRepository eventRepository;
+    private final TrickRepository trickRepository;
 
-    public EventResource(EventRepository eventRepository) {
+    public EventResource(EventRepository eventRepository, TrickRepository trickRepository) {
+
         this.eventRepository = eventRepository;
+        this.trickRepository = trickRepository;
     }
 
     /**
@@ -46,7 +53,7 @@ public class EventResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/events")
-    public ResponseEntity<Event> createEvent(@RequestBody Event event) throws URISyntaxException {
+    public ResponseEntity<Event> createEvent(@Valid @RequestBody Event event) throws URISyntaxException {
         log.debug("REST request to save Event : {}", event);
         if (event.getId() != null) {
             throw new BadRequestAlertException("A new event cannot already have an ID", ENTITY_NAME, "idexists");
@@ -67,7 +74,7 @@ public class EventResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/events")
-    public ResponseEntity<Event> updateEvent(@RequestBody Event event) throws URISyntaxException {
+    public ResponseEntity<Event> updateEvent(@Valid @RequestBody Event event) throws URISyntaxException {
         log.debug("REST request to update Event : {}", event);
         if (event.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -78,6 +85,19 @@ public class EventResource {
             .body(result);
     }
 
+    @PutMapping("/events/addTrick")
+    public ResponseEntity<Event> addTrick(@Valid @RequestBody AddTrick addTrick)throws URISyntaxException{
+        log.debug("REST request to addTrick AddTrick : {}", addTrick);
+        if(addTrick.getIdEvent() == null){
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "eventIdnull");
+        }
+        Event event = eventRepository.findById(addTrick.getIdEvent()).get();
+        Trick trick = trickRepository.findById(addTrick.getIdTrick()).get();
+        event.addTrick(trick);
+        Event result = eventRepository.save(event);
+
+        return ResponseUtil.wrapOrNotFound(Optional.of(result));
+    }
     /**
      * {@code GET  /events} : get all the events.
      *

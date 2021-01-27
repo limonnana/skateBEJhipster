@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import javax.validation.constraints.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -27,6 +28,10 @@ public class Event implements Serializable {
     @Field("day_string")
     private String dayString;
 
+    @NotNull
+    @Field("name")
+    private String name;
+
     @DBRef
     @Field("trick")
     private Set<Trick> tricks = new HashSet<>();
@@ -38,6 +43,10 @@ public class Event implements Serializable {
     @DBRef
     @Field("fan")
     private Set<Fan> fans = new HashSet<>();
+
+    @DBRef
+    @Field("spot")
+    private Spot spot;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -72,6 +81,19 @@ public class Event implements Serializable {
 
     public void setDayString(String dayString) {
         this.dayString = dayString;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Event name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Set<Trick> getTricks() {
@@ -142,6 +164,19 @@ public class Event implements Serializable {
     public void setFans(Set<Fan> fans) {
         this.fans = fans;
     }
+
+    public Spot getSpot() {
+        return spot;
+    }
+
+    public Event spot(Spot spot) {
+        this.spot = spot;
+        return this;
+    }
+
+    public void setSpot(Spot spot) {
+        this.spot = spot;
+    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -167,6 +202,7 @@ public class Event implements Serializable {
             "id=" + getId() +
             ", day='" + getDay() + "'" +
             ", dayString='" + getDayString() + "'" +
+            ", name='" + getName() + "'" +
             "}";
     }
 }

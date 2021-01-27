@@ -19,6 +19,14 @@
       "otherEntityName": "fan",
       "relationshipType": "one-to-many",
       "otherEntityRelationshipName": "event"
+    },
+    {
+      "relationshipName": "spot",
+      "otherEntityName": "spot",
+      "relationshipType": "one-to-one",
+      "otherEntityField": "name",
+      "ownerSide": true,
+      "otherEntityRelationshipName": "event"
     }
   ],
   "fields": [
@@ -29,6 +37,11 @@
     {
       "fieldName": "dayString",
       "fieldType": "String"
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
     }
   ],
   "dto": "no",

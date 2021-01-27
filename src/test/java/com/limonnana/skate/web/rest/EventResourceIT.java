@@ -36,6 +36,9 @@ public class EventResourceIT {
     private static final String DEFAULT_DAY_STRING = "AAAAAAAAAA";
     private static final String UPDATED_DAY_STRING = "BBBBBBBBBB";
 
+    private static final String DEFAULT_NAME = "AAAAAAAAAA";
+    private static final String UPDATED_NAME = "BBBBBBBBBB";
+
     @Autowired
     private EventRepository eventRepository;
 
@@ -53,7 +56,8 @@ public class EventResourceIT {
     public static Event createEntity() {
         Event event = new Event()
             .day(DEFAULT_DAY)
-            .dayString(DEFAULT_DAY_STRING);
+            .dayString(DEFAULT_DAY_STRING)
+            .name(DEFAULT_NAME);
         return event;
     }
     /**
@@ -65,7 +69,8 @@ public class EventResourceIT {
     public static Event createUpdatedEntity() {
         Event event = new Event()
             .day(UPDATED_DAY)
-            .dayString(UPDATED_DAY_STRING);
+            .dayString(UPDATED_DAY_STRING)
+            .name(UPDATED_NAME);
         return event;
     }
 
@@ -90,6 +95,7 @@ public class EventResourceIT {
         Event testEvent = eventList.get(eventList.size() - 1);
         assertThat(testEvent.getDay()).isEqualTo(DEFAULT_DAY);
         assertThat(testEvent.getDayString()).isEqualTo(DEFAULT_DAY_STRING);
+        assertThat(testEvent.getName()).isEqualTo(DEFAULT_NAME);
     }
 
     @Test
@@ -112,6 +118,24 @@ public class EventResourceIT {
 
 
     @Test
+    public void checkNameIsRequired() throws Exception {
+        int databaseSizeBeforeTest = eventRepository.findAll().size();
+        // set the field null
+        event.setName(null);
+
+        // Create the Event, which fails.
+
+
+        restEventMockMvc.perform(post("/api/events")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(event)))
+            .andExpect(status().isBadRequest());
+
+        List<Event> eventList = eventRepository.findAll();
+        assertThat(eventList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
     public void getAllEvents() throws Exception {
         // Initialize the database
         eventRepository.save(event);
@@ -122,7 +146,8 @@ public class EventResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(event.getId())))
             .andExpect(jsonPath("$.[*].day").value(hasItem(DEFAULT_DAY.toString())))
-            .andExpect(jsonPath("$.[*].dayString").value(hasItem(DEFAULT_DAY_STRING)));
+            .andExpect(jsonPath("$.[*].dayString").value(hasItem(DEFAULT_DAY_STRING)))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)));
     }
     
     @Test
@@ -136,7 +161,8 @@ public class EventResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(event.getId()))
             .andExpect(jsonPath("$.day").value(DEFAULT_DAY.toString()))
-            .andExpect(jsonPath("$.dayString").value(DEFAULT_DAY_STRING));
+            .andExpect(jsonPath("$.dayString").value(DEFAULT_DAY_STRING))
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME));
     }
     @Test
     public void getNonExistingEvent() throws Exception {
@@ -156,7 +182,8 @@ public class EventResourceIT {
         Event updatedEvent = eventRepository.findById(event.getId()).get();
         updatedEvent
             .day(UPDATED_DAY)
-            .dayString(UPDATED_DAY_STRING);
+            .dayString(UPDATED_DAY_STRING)
+            .name(UPDATED_NAME);
 
         restEventMockMvc.perform(put("/api/events")
             .contentType(MediaType.APPLICATION_JSON)
@@ -169,6 +196,7 @@ public class EventResourceIT {
         Event testEvent = eventList.get(eventList.size() - 1);
         assertThat(testEvent.getDay()).isEqualTo(UPDATED_DAY);
         assertThat(testEvent.getDayString()).isEqualTo(UPDATED_DAY_STRING);
+        assertThat(testEvent.getName()).isEqualTo(UPDATED_NAME);
     }
 
     @Test
