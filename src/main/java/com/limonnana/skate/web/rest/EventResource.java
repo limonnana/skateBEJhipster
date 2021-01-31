@@ -1,9 +1,8 @@
 package com.limonnana.skate.web.rest;
 
-import com.limonnana.skate.domain.AddTrick;
-import com.limonnana.skate.domain.Event;
-import com.limonnana.skate.domain.Trick;
+import com.limonnana.skate.domain.*;
 import com.limonnana.skate.repository.EventRepository;
+import com.limonnana.skate.repository.PlayerRepository;
 import com.limonnana.skate.repository.TrickRepository;
 import com.limonnana.skate.web.rest.errors.BadRequestAlertException;
 
@@ -38,11 +37,13 @@ public class EventResource {
 
     private final EventRepository eventRepository;
     private final TrickRepository trickRepository;
+    private final PlayerRepository playerRepository;
 
-    public EventResource(EventRepository eventRepository, TrickRepository trickRepository) {
+    public EventResource(EventRepository eventRepository, TrickRepository trickRepository, PlayerRepository playerRepository) {
 
         this.eventRepository = eventRepository;
         this.trickRepository = trickRepository;
+        this.playerRepository = playerRepository;
     }
 
     /**
@@ -83,6 +84,20 @@ public class EventResource {
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, event.getId()))
             .body(result);
+    }
+
+    @PutMapping("/events/addPlayer")
+    public ResponseEntity<Event> addPlayer(@Valid @RequestBody AddPlayer addPlayer)throws URISyntaxException{
+        log.debug("REST request to addPlayer AddPlayer : {}", addPlayer);
+        if(addPlayer.getIdEvent() == null){
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "eventIdnull");
+        }
+        Event event = eventRepository.findById(addPlayer.getIdEvent()).get();
+        Player player = playerRepository.findById(addPlayer.getIdPlayer()).get();
+        event.addPlayer(player);
+        Event result = eventRepository.save(event);
+
+        return ResponseUtil.wrapOrNotFound(Optional.of(result));
     }
 
     @PutMapping("/events/addTrick")
