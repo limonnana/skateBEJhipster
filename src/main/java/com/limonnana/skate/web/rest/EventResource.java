@@ -2,6 +2,7 @@ package com.limonnana.skate.web.rest;
 
 import com.limonnana.skate.domain.*;
 import com.limonnana.skate.repository.EventRepository;
+import com.limonnana.skate.repository.PhotoRepository;
 import com.limonnana.skate.repository.PlayerRepository;
 import com.limonnana.skate.repository.TrickRepository;
 import com.limonnana.skate.web.rest.errors.BadRequestAlertException;
@@ -12,10 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -38,12 +39,14 @@ public class EventResource {
     private final EventRepository eventRepository;
     private final TrickRepository trickRepository;
     private final PlayerRepository playerRepository;
+    private final PhotoRepository photoRepository;
 
-    public EventResource(EventRepository eventRepository, TrickRepository trickRepository, PlayerRepository playerRepository) {
+    public EventResource(EventRepository eventRepository, TrickRepository trickRepository, PlayerRepository playerRepository, PhotoRepository photoRepository) {
 
         this.eventRepository = eventRepository;
         this.trickRepository = trickRepository;
         this.playerRepository = playerRepository;
+        this.photoRepository = photoRepository;
     }
 
     /**
@@ -80,10 +83,34 @@ public class EventResource {
         if (event.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        Event result = eventRepository.save(event);
+        Event e = eventRepository.findById(event.getId()).get();
+        e.setDay(event.getDay());
+        e.setDayString(event.getDayString());
+        e.setName(event.getName());
+        e.setSpot(event.getSpot());
+        Event result = eventRepository.save(e);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, event.getId()))
             .body(result);
+    }
+
+    @PostMapping("/events/addImage")
+    public ResponseEntity<Event> addImage(@RequestPart("title") String title, @RequestPart("idEvent") String idEvent, @RequestPart("file") String file ) throws IOException {
+        /*
+        if(addImage.getIdEvent() == null){
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "eventIdnull");
+        }*/
+        Event event = eventRepository.findById(idEvent).get();
+       // Photo p = photoService.savePhoto(title, file);
+       // event.setPhoto(p);
+        Photo p = new Photo();
+        p.setImage(file);
+        p.setTitle(title);
+        p = photoRepository.save(p);
+        event.getPhotos().add(p);
+        Event result = eventRepository.save(event);
+
+        return ResponseUtil.wrapOrNotFound(Optional.of(result));
     }
 
     @PutMapping("/events/addPlayer")

@@ -48,6 +48,10 @@ public class Event implements Serializable {
     @Field("spot")
     private Spot spot;
 
+    @DBRef
+    @Field("photo")
+    private Set<Photo> photos = new HashSet<>();
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
         return id;
@@ -204,5 +208,14 @@ public class Event implements Serializable {
             ", dayString='" + getDayString() + "'" +
             ", name='" + getName() + "'" +
             "}";
+    }
+
+
+    public Set<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(Set<Photo> photos) {
+        this.photos = photos;
     }
 }
