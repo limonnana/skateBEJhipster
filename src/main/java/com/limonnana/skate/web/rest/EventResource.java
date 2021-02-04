@@ -19,8 +19,10 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * REST controller for managing {@link com.limonnana.skate.domain.Event}.
@@ -96,13 +98,8 @@ public class EventResource {
 
     @PostMapping("/events/addImage")
     public ResponseEntity<Event> addImage(@RequestPart("title") String title, @RequestPart("idEvent") String idEvent, @RequestPart("file") String file ) throws IOException {
-        /*
-        if(addImage.getIdEvent() == null){
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "eventIdnull");
-        }*/
+
         Event event = eventRepository.findById(idEvent).get();
-       // Photo p = photoService.savePhoto(title, file);
-       // event.setPhoto(p);
         Photo p = new Photo();
         p.setImage(file);
         p.setTitle(title);
@@ -110,6 +107,16 @@ public class EventResource {
         event.getPhotos().add(p);
         Event result = eventRepository.save(event);
 
+        return ResponseUtil.wrapOrNotFound(Optional.of(result));
+    }
+
+    @PostMapping("/events/deleteImage")
+    public ResponseEntity<Event> deleteImage(@RequestPart("idImage") String idImage, @RequestPart("idEvent") String idEvent) {
+        log.debug("REST request to delete Image : {}", idImage);
+        Event event = eventRepository.findById(idEvent).get();
+        removeObjectFromSet(event.getPhotos(), idImage);
+        Event result = eventRepository.save(event);
+      //  photoRepository.deleteById(idImage);
         return ResponseUtil.wrapOrNotFound(Optional.of(result));
     }
 
@@ -175,5 +182,15 @@ public class EventResource {
         log.debug("REST request to delete Event : {}", id);
         eventRepository.deleteById(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id)).build();
+    }
+
+    private void removeObjectFromSet(Set<Photo> s, String photoId){
+        Iterator<Photo> iterator = s.iterator();
+        while(iterator.hasNext())
+        {
+            if(iterator.next().getId().equals(photoId))
+                iterator.remove();
+        }
+
     }
 }
