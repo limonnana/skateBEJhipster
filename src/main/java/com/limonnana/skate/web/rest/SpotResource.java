@@ -1,6 +1,9 @@
 package com.limonnana.skate.web.rest;
 
+import com.limonnana.skate.domain.Event;
+import com.limonnana.skate.domain.Photo;
 import com.limonnana.skate.domain.Spot;
+import com.limonnana.skate.repository.PhotoRepository;
 import com.limonnana.skate.repository.SpotRepository;
 import com.limonnana.skate.web.rest.errors.BadRequestAlertException;
 
@@ -14,10 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * REST controller for managing {@link com.limonnana.skate.domain.Spot}.
@@ -34,9 +40,14 @@ public class SpotResource {
     private String applicationName;
 
     private final SpotRepository spotRepository;
+    private final PhotoRepository photoRepository;
 
-    public SpotResource(SpotRepository spotRepository) {
+    public SpotResource(
+        SpotRepository spotRepository,
+        PhotoRepository photoRepository
+    ) {
         this.spotRepository = spotRepository;
+        this.photoRepository = photoRepository;
     }
 
     /**
@@ -79,6 +90,29 @@ public class SpotResource {
             .body(result);
     }
 
+    @PostMapping("/spots/addImage")
+    public ResponseEntity<Spot> addImage(@RequestPart("title") String title, @RequestPart("idSpot") String idSpot, @RequestPart("file") String file ) throws IOException {
+
+        Spot spot = spotRepository.findById(idSpot).get();
+        Photo p = new Photo();
+        p.setImage(file);
+        p.setTitle(title);
+        p = photoRepository.save(p);
+        spot.getPhotos().add(p);
+        Spot result = spotRepository.save(spot);
+        return ResponseUtil.wrapOrNotFound(Optional.of(result));
+    }
+
+    @PostMapping("/spots/deleteImage")
+    public ResponseEntity<Spot> deleteImage(@RequestPart("idImage") String idImage, @RequestPart("idSpot") String idSpot) {
+        log.debug("REST request to delete Image from spot: {}", idImage);
+        Spot spot = spotRepository.findById(idSpot).get();
+        removeObjectFromSet(spot.getPhotos(), idImage);
+        Spot result = spotRepository.save(spot);
+        photoRepository.deleteById(idImage);
+        return ResponseUtil.wrapOrNotFound(Optional.of(result));
+    }
+
     /**
      * {@code GET  /spots} : get all the spots.
      *
@@ -114,5 +148,15 @@ public class SpotResource {
         log.debug("REST request to delete Spot : {}", id);
         spotRepository.deleteById(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id)).build();
+    }
+
+    private void removeObjectFromSet(Set<Photo> s, String photoId){
+        Iterator<Photo> iterator = s.iterator();
+        while(iterator.hasNext())
+        {
+            if(iterator.next().getId().equals(photoId))
+                iterator.remove();
+        }
+
     }
 }

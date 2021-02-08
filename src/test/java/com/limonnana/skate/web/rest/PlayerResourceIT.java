@@ -3,8 +3,6 @@ package com.limonnana.skate.web.rest;
 import com.limonnana.skate.Skate03App;
 import com.limonnana.skate.domain.Player;
 import com.limonnana.skate.repository.PlayerRepository;
-import com.limonnana.skate.service.PlayerService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +45,6 @@ public class PlayerResourceIT {
     @Autowired
     private PlayerRepository playerRepository;
 
-    @Autowired
-    private PlayerService playerService;
 
     @Autowired
     private MockMvc restPlayerMockMvc;
@@ -183,7 +179,7 @@ public class PlayerResourceIT {
             .andExpect(jsonPath("$.[*].phone").value(hasItem(DEFAULT_PHONE)))
             .andExpect(jsonPath("$.[*].country").value(hasItem(DEFAULT_COUNTRY)));
     }
-    
+
     @Test
     public void getPlayer() throws Exception {
         // Initialize the database
@@ -210,7 +206,7 @@ public class PlayerResourceIT {
     @Test
     public void updatePlayer() throws Exception {
         // Initialize the database
-        playerService.save(player);
+        playerRepository.save(player);
 
         int databaseSizeBeforeUpdate = playerRepository.findAll().size();
 
@@ -257,7 +253,7 @@ public class PlayerResourceIT {
     @Test
     public void deletePlayer() throws Exception {
         // Initialize the database
-        playerService.save(player);
+        playerRepository.save(player);
 
         int databaseSizeBeforeDelete = playerRepository.findAll().size();
 

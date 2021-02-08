@@ -54,7 +54,6 @@ public class SpotResourceIT {
     public static Spot createEntity() {
         Spot spot = new Spot()
             .name(DEFAULT_NAME)
-            .imgPath(DEFAULT_IMG_PATH)
             .description(DEFAULT_DESCRIPTION);
         return spot;
     }
@@ -67,7 +66,6 @@ public class SpotResourceIT {
     public static Spot createUpdatedEntity() {
         Spot spot = new Spot()
             .name(UPDATED_NAME)
-            .imgPath(UPDATED_IMG_PATH)
             .description(UPDATED_DESCRIPTION);
         return spot;
     }
@@ -92,7 +90,6 @@ public class SpotResourceIT {
         assertThat(spotList).hasSize(databaseSizeBeforeCreate + 1);
         Spot testSpot = spotList.get(spotList.size() - 1);
         assertThat(testSpot.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testSpot.getImgPath()).isEqualTo(DEFAULT_IMG_PATH);
         assertThat(testSpot.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
     }
 
@@ -147,7 +144,7 @@ public class SpotResourceIT {
             .andExpect(jsonPath("$.[*].imgPath").value(hasItem(DEFAULT_IMG_PATH)))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
     }
-    
+
     @Test
     public void getSpot() throws Exception {
         // Initialize the database
@@ -180,7 +177,6 @@ public class SpotResourceIT {
         Spot updatedSpot = spotRepository.findById(spot.getId()).get();
         updatedSpot
             .name(UPDATED_NAME)
-            .imgPath(UPDATED_IMG_PATH)
             .description(UPDATED_DESCRIPTION);
 
         restSpotMockMvc.perform(put("/api/spots")
@@ -193,7 +189,6 @@ public class SpotResourceIT {
         assertThat(spotList).hasSize(databaseSizeBeforeUpdate);
         Spot testSpot = spotList.get(spotList.size() - 1);
         assertThat(testSpot.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testSpot.getImgPath()).isEqualTo(UPDATED_IMG_PATH);
         assertThat(testSpot.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
     }
 

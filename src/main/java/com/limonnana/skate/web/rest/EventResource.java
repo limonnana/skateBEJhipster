@@ -116,7 +116,7 @@ public class EventResource {
         Event event = eventRepository.findById(idEvent).get();
         removeObjectFromSet(event.getPhotos(), idImage);
         Event result = eventRepository.save(event);
-      //  photoRepository.deleteById(idImage);
+        photoRepository.deleteById(idImage);
         return ResponseUtil.wrapOrNotFound(Optional.of(result));
     }
 

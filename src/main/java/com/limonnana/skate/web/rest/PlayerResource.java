@@ -1,7 +1,7 @@
 package com.limonnana.skate.web.rest;
 
 import com.limonnana.skate.domain.Player;
-import com.limonnana.skate.service.PlayerService;
+import com.limonnana.skate.repository.PlayerRepository;
 import com.limonnana.skate.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -32,10 +32,10 @@ public class PlayerResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
-    private final PlayerService playerService;
+    private final PlayerRepository playerRepository;
 
-    public PlayerResource(PlayerService playerService) {
-        this.playerService = playerService;
+    public PlayerResource(PlayerRepository playerRepository) {
+        this.playerRepository = playerRepository;
     }
 
     /**
@@ -51,7 +51,7 @@ public class PlayerResource {
         if (player.getId() != null) {
             throw new BadRequestAlertException("A new player cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Player result = playerService.save(player);
+        Player result = playerRepository.save(player);
         return ResponseEntity.created(new URI("/api/players/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId()))
             .body(result);
@@ -72,7 +72,7 @@ public class PlayerResource {
         if (player.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        Player result = playerService.save(player);
+        Player result = playerRepository.save(player);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, player.getId()))
             .body(result);
@@ -86,7 +86,7 @@ public class PlayerResource {
     @GetMapping("/players")
     public List<Player> getAllPlayers() {
         log.debug("REST request to get all Players");
-        return playerService.findAll();
+        return playerRepository.findAll();
     }
 
     /**
@@ -98,7 +98,7 @@ public class PlayerResource {
     @GetMapping("/players/{id}")
     public ResponseEntity<Player> getPlayer(@PathVariable String id) {
         log.debug("REST request to get Player : {}", id);
-        Optional<Player> player = playerService.findOne(id);
+        Optional<Player> player = playerRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(player);
     }
 
@@ -111,7 +111,7 @@ public class PlayerResource {
     @DeleteMapping("/players/{id}")
     public ResponseEntity<Void> deletePlayer(@PathVariable String id) {
         log.debug("REST request to delete Player : {}", id);
-        playerService.delete(id);
+        playerRepository.deleteById(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id)).build();
     }
 }

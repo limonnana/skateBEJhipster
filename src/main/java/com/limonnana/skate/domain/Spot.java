@@ -1,11 +1,14 @@
 package com.limonnana.skate.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Spot.
@@ -22,11 +25,13 @@ public class Spot implements Serializable {
     @Field("name")
     private String name;
 
-    @Field("img_path")
-    private String imgPath;
 
     @Field("description")
     private String description;
+
+    @DBRef
+    @Field("photo")
+    private Set<Photo> photos = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -50,18 +55,6 @@ public class Spot implements Serializable {
         this.name = name;
     }
 
-    public String getImgPath() {
-        return imgPath;
-    }
-
-    public Spot imgPath(String imgPath) {
-        this.imgPath = imgPath;
-        return this;
-    }
-
-    public void setImgPath(String imgPath) {
-        this.imgPath = imgPath;
-    }
 
     public String getDescription() {
         return description;
@@ -99,8 +92,15 @@ public class Spot implements Serializable {
         return "Spot{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", imgPath='" + getImgPath() + "'" +
             ", description='" + getDescription() + "'" +
             "}";
+    }
+
+    public Set<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(Set<Photo> photos) {
+        this.photos = photos;
     }
 }
