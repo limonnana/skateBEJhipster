@@ -12,4 +12,6 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface EventRepository extends MongoRepository<Event, String> {
+
+
 }

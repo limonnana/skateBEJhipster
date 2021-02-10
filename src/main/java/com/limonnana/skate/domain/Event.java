@@ -52,6 +52,9 @@ public class Event implements Serializable {
     @Field("photo")
     private Set<Photo> photos = new HashSet<>();
 
+    @Field("active")
+    private boolean active;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
         return id;
@@ -217,5 +220,13 @@ public class Event implements Serializable {
 
     public void setPhotos(Set<Photo> photos) {
         this.photos = photos;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

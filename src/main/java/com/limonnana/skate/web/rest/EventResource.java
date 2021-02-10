@@ -61,6 +61,7 @@ public class EventResource {
     @PostMapping("/events")
     public ResponseEntity<Event> createEvent(@Valid @RequestBody Event event) throws URISyntaxException {
         log.debug("REST request to save Event : {}", event);
+        event.setActive(true);
         if (event.getId() != null) {
             throw new BadRequestAlertException("A new event cannot already have an ID", ENTITY_NAME, "idexists");
         }
@@ -90,10 +91,28 @@ public class EventResource {
         e.setDayString(event.getDayString());
         e.setName(event.getName());
         e.setSpot(event.getSpot());
+        e.setActive(event.isActive());
         Event result = eventRepository.save(e);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, event.getId()))
             .body(result);
+    }
+
+    @GetMapping("/events/active")
+    public ResponseEntity<Event> getActive() throws Exception {
+        log.debug("REST request to get Active Event : {}");
+        List<Event> events = eventRepository.findAll();
+        Event result = null;
+        if(events == null){
+            throw new Exception();
+        }
+        for(Event e : events){
+            if(e.isActive()){
+                result = e;
+                break;
+            }
+        }
+        return ResponseUtil.wrapOrNotFound(Optional.of(result));
     }
 
     @PostMapping("/events/addImage")
@@ -170,6 +189,7 @@ public class EventResource {
         Optional<Event> event = eventRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(event);
     }
+
 
     /**
      * {@code DELETE  /events/:id} : delete the "id" event.
