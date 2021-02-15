@@ -38,7 +38,7 @@ public class FanResourceIT {
     private static final String UPDATED_PHONE = "BBBBBBBBBB";
 
     private static final String DEFAULT_IMG_PATH = "AAAAAAAAAA";
-    private static final String UPDATED_IMG_PATH = "BBBBBBBBBB";
+
 
     @Autowired
     private FanRepository fanRepository;
@@ -58,8 +58,7 @@ public class FanResourceIT {
         Fan fan = new Fan()
             .fullName(DEFAULT_FULL_NAME)
             .email(DEFAULT_EMAIL)
-            .phone(DEFAULT_PHONE)
-            .imgPath(DEFAULT_IMG_PATH);
+            .phone(DEFAULT_PHONE);
         return fan;
     }
     /**
@@ -72,8 +71,8 @@ public class FanResourceIT {
         Fan fan = new Fan()
             .fullName(UPDATED_FULL_NAME)
             .email(UPDATED_EMAIL)
-            .phone(UPDATED_PHONE)
-            .imgPath(UPDATED_IMG_PATH);
+            .phone(UPDATED_PHONE);
+
         return fan;
     }
 
@@ -99,7 +98,7 @@ public class FanResourceIT {
         assertThat(testFan.getFullName()).isEqualTo(DEFAULT_FULL_NAME);
         assertThat(testFan.getEmail()).isEqualTo(DEFAULT_EMAIL);
         assertThat(testFan.getPhone()).isEqualTo(DEFAULT_PHONE);
-        assertThat(testFan.getImgPath()).isEqualTo(DEFAULT_IMG_PATH);
+
     }
 
     @Test
@@ -154,7 +153,7 @@ public class FanResourceIT {
             .andExpect(jsonPath("$.[*].phone").value(hasItem(DEFAULT_PHONE)))
             .andExpect(jsonPath("$.[*].imgPath").value(hasItem(DEFAULT_IMG_PATH)));
     }
-    
+
     @Test
     public void getFan() throws Exception {
         // Initialize the database
@@ -189,8 +188,8 @@ public class FanResourceIT {
         updatedFan
             .fullName(UPDATED_FULL_NAME)
             .email(UPDATED_EMAIL)
-            .phone(UPDATED_PHONE)
-            .imgPath(UPDATED_IMG_PATH);
+            .phone(UPDATED_PHONE);
+
 
         restFanMockMvc.perform(put("/api/fans")
             .contentType(MediaType.APPLICATION_JSON)
@@ -204,7 +203,7 @@ public class FanResourceIT {
         assertThat(testFan.getFullName()).isEqualTo(UPDATED_FULL_NAME);
         assertThat(testFan.getEmail()).isEqualTo(UPDATED_EMAIL);
         assertThat(testFan.getPhone()).isEqualTo(UPDATED_PHONE);
-        assertThat(testFan.getImgPath()).isEqualTo(UPDATED_IMG_PATH);
+
     }
 
     @Test

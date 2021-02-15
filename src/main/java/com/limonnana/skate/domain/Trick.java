@@ -23,10 +23,10 @@ public class Trick implements Serializable {
     private String name;
 
     @Field("objective_amount")
-    private Integer objectiveAmount;
+    private Integer objectiveAmount = 0;
 
     @Field("current_amount")
-    private Integer currentAmount;
+    private Integer currentAmount = 0;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {

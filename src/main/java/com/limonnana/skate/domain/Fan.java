@@ -28,8 +28,6 @@ public class Fan implements Serializable {
     @Field("phone")
     private String phone;
 
-    @Field("img_path")
-    private String imgPath;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -79,18 +77,7 @@ public class Fan implements Serializable {
         this.phone = phone;
     }
 
-    public String getImgPath() {
-        return imgPath;
-    }
 
-    public Fan imgPath(String imgPath) {
-        this.imgPath = imgPath;
-        return this;
-    }
-
-    public void setImgPath(String imgPath) {
-        this.imgPath = imgPath;
-    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -117,7 +104,6 @@ public class Fan implements Serializable {
             ", fullName='" + getFullName() + "'" +
             ", email='" + getEmail() + "'" +
             ", phone='" + getPhone() + "'" +
-            ", imgPath='" + getImgPath() + "'" +
             "}";
     }
 }

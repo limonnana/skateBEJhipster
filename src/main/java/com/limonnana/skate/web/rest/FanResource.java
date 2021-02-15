@@ -1,7 +1,10 @@
 package com.limonnana.skate.web.rest;
 
+import com.limonnana.skate.domain.ContributionForm;
 import com.limonnana.skate.domain.Fan;
+import com.limonnana.skate.domain.Trick;
 import com.limonnana.skate.repository.FanRepository;
+import com.limonnana.skate.repository.TrickRepository;
 import com.limonnana.skate.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -40,9 +43,14 @@ public class FanResource {
     private String applicationName;
 
     private final FanRepository fanRepository;
+    private final TrickRepository trickRepository;
 
-    public FanResource(FanRepository fanRepository) {
+    public FanResource(
+        FanRepository fanRepository,
+        TrickRepository trickRepository
+    ) {
         this.fanRepository = fanRepository;
+        this.trickRepository = trickRepository;
     }
 
     /**
@@ -62,6 +70,34 @@ public class FanResource {
         return ResponseEntity.created(new URI("/api/fans/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId()))
             .body(result);
+    }
+
+    @PostMapping("/fans/contribution")
+    public ResponseEntity<Fan> createFanContribution(@Valid @RequestBody ContributionForm contributionForm) throws URISyntaxException {
+        log.debug("REST request to save Fan Contribution : {}", contributionForm);
+
+        Fan fan = new Fan();
+
+        if(contributionForm.getFanId() != null){
+            fan = fanRepository.findById(contributionForm.getFanId()).get();
+        }else{
+            fan.setFullName(contributionForm.getFanFullName());
+            fan.setPhone(contributionForm.getPhone());
+            fan = fanRepository.save(fan);
+        }
+
+        Trick trick = trickRepository.findById(contributionForm.getTrick().getId()).get();
+        int ca = trick.getCurrentAmount().intValue();
+        String amount = contributionForm.getAmount();
+        int toAdd = Integer.parseInt(amount);
+        int amountTotal =  ca + toAdd;
+        trick.setCurrentAmount(amountTotal);
+        trickRepository.save(trick);
+
+
+        return ResponseEntity.created(new URI("/api/fans/" + fan.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, fan.getId()))
+            .body(fan);
     }
 
     /**
@@ -124,4 +160,6 @@ public class FanResource {
         fanRepository.deleteById(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id)).build();
     }
+
+
 }
