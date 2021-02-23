@@ -28,6 +28,10 @@ public class Fan implements Serializable {
     @Field("phone")
     private String phone;
 
+    @NotNull
+    @Field("password")
+    private String password;
+
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -105,5 +109,13 @@ public class Fan implements Serializable {
             ", email='" + getEmail() + "'" +
             ", phone='" + getPhone() + "'" +
             "}";
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

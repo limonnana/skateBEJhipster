@@ -1,9 +1,11 @@
 package com.limonnana.skate.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import javax.validation.constraints.*;
+import com.limonnana.skate.domain.Photo;
 
 import java.io.Serializable;
 
@@ -34,6 +36,10 @@ public class Player implements Serializable {
 
     @Field("country")
     private String country;
+
+    @DBRef
+    @Field("photo")
+    private Photo profilePicture;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -137,5 +143,13 @@ public class Player implements Serializable {
             ", phone='" + getPhone() + "'" +
             ", country='" + getCountry() + "'" +
             "}";
+    }
+
+    public Photo getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(Photo profilePicture) {
+        this.profilePicture = profilePicture;
     }
 }
