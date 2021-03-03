@@ -5,6 +5,7 @@ import com.limonnana.skate.domain.User;
 import com.limonnana.skate.repository.UserRepository;
 import com.limonnana.skate.security.AuthoritiesConstants;
 import com.limonnana.skate.service.MailService;
+import com.limonnana.skate.service.dto.PictureDTO;
 import org.springframework.data.domain.Sort;
 import java.util.Collections;
 import com.limonnana.skate.service.UserService;
@@ -112,6 +113,22 @@ public class UserResource {
                 .body(newUser);
         }
     }
+
+    @PostMapping("/users/picture")
+    public ResponseEntity<User> addProfilePicture(@Valid @RequestBody PictureDTO pictureDTO){
+
+        User user = userRepository.findOneByLogin(pictureDTO.getLogin().toLowerCase()).get();
+
+        if(user == null){
+            throw new BadRequestAlertException(" user with that login doesn't exist ", "UserNULL", "UserNULL");
+        }
+        user.setPicture(pictureDTO.getPicture());
+        user = userRepository.save(user);
+
+        return ResponseUtil.wrapOrNotFound(Optional.of(user),
+            HeaderUtil.createAlert(applicationName, "Picture has been updated", user.getLogin()));
+    }
+
 
     /**
      * {@code PUT /users} : Updates an existing User.

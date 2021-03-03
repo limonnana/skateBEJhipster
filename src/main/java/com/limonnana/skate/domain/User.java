@@ -55,6 +55,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     private boolean activated = false;
 
+    @Field("picture")
+    private String picture;
+
     @Size(min = 2, max = 10)
     @Field("lang_key")
     private String langKey;
@@ -214,5 +217,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
             ", langKey='" + langKey + '\'' +
             ", activationKey='" + activationKey + '\'' +
             "}";
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
     }
 }

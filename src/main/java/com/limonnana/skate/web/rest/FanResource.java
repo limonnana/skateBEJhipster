@@ -72,6 +72,7 @@ public class FanResource {
             .body(result);
     }
 
+
     @PostMapping("/fans/contribution")
     public ResponseEntity<Fan> createFanContribution(@Valid @RequestBody ContributionForm contributionForm) throws URISyntaxException {
         log.debug("REST request to save Fan Contribution : {}", contributionForm);

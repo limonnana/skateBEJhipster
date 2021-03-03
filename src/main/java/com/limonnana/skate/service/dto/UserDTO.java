@@ -4,6 +4,7 @@ import com.limonnana.skate.config.Constants;
 
 import com.limonnana.skate.domain.Authority;
 import com.limonnana.skate.domain.User;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.*;
 import java.time.Instant;
@@ -34,6 +35,8 @@ public class UserDTO {
 
     @Size(max = 256)
     private String imageUrl;
+
+    private String picture;
 
     private boolean activated = false;
 
@@ -67,6 +70,7 @@ public class UserDTO {
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
+        this.picture = user.getPicture();
         this.authorities = user.getAuthorities().stream()
             .map(Authority::getName)
             .collect(Collectors.toSet());
@@ -187,11 +191,20 @@ public class UserDTO {
             ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +
             ", langKey='" + langKey + '\'' +
+            ", picture='" + picture + '\'' +
             ", createdBy=" + createdBy +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             ", authorities=" + authorities +
             "}";
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
     }
 }

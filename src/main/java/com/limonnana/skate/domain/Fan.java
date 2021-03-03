@@ -32,6 +32,9 @@ public class Fan implements Serializable {
     @Field("password")
     private String password;
 
+    @Field("picture_profile")
+    private String pictureProfile;
+
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -117,5 +120,13 @@ public class Fan implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPictureProfile() {
+        return pictureProfile;
+    }
+
+    public void setPictureProfile(String pictureProfile) {
+        this.pictureProfile = pictureProfile;
     }
 }
