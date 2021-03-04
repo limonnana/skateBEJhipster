@@ -3,8 +3,10 @@ package com.limonnana.skate.web.rest;
 import com.limonnana.skate.domain.ContributionForm;
 import com.limonnana.skate.domain.Fan;
 import com.limonnana.skate.domain.Trick;
+import com.limonnana.skate.domain.User;
 import com.limonnana.skate.repository.FanRepository;
 import com.limonnana.skate.repository.TrickRepository;
+import com.limonnana.skate.repository.UserRepository;
 import com.limonnana.skate.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -44,13 +46,16 @@ public class FanResource {
 
     private final FanRepository fanRepository;
     private final TrickRepository trickRepository;
+    private final UserRepository userRepository;
 
     public FanResource(
         FanRepository fanRepository,
-        TrickRepository trickRepository
+        TrickRepository trickRepository,
+        UserRepository userRepository
     ) {
         this.fanRepository = fanRepository;
         this.trickRepository = trickRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -82,8 +87,17 @@ public class FanResource {
         if(contributionForm.getFanId() != null){
             fan = fanRepository.findById(contributionForm.getFanId()).get();
         }else{
-            fan.setFullName(contributionForm.getFanFullName());
-            fan.setPhone(contributionForm.getPhone());
+            User user = new User();
+            String fullName = contributionForm.getFanFullName().trim();
+            int location = fullName.indexOf(" ");
+            String firstName = fullName.substring(0, location);
+            String lastName = fullName.substring(location + 1);
+            user.setLogin(contributionForm.getPhone());
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setPhone(contributionForm.getPhone());
+            user = userRepository.save(user);
+            fan.setUser(user);
             fan = fanRepository.save(fan);
         }
 

@@ -29,8 +29,11 @@ public class UserDTO {
     @Size(max = 50)
     private String lastName;
 
+    @Size(min = 9, max = 13)
+    private String phone;
+
     @Email
-    @Size(min = 5, max = 254)
+    @Size(max = 254)
     private String email;
 
     @Size(max = 256)
@@ -62,6 +65,7 @@ public class UserDTO {
         this.login = user.getLogin();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
+        this.phone = user.getPhone();
         this.email = user.getEmail();
         this.activated = user.getActivated();
         this.imageUrl = user.getImageUrl();
@@ -187,6 +191,7 @@ public class UserDTO {
             "login='" + login + '\'' +
             ", firstName='" + firstName + '\'' +
             ", lastName='" + lastName + '\'' +
+            ", phone='" + phone + '\'' +
             ", email='" + email + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +
@@ -206,5 +211,13 @@ public class UserDTO {
 
     public void setPicture(String picture) {
         this.picture = picture;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

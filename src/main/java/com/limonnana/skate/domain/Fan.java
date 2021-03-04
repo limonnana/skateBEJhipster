@@ -1,6 +1,7 @@
 package com.limonnana.skate.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import javax.validation.constraints.*;
@@ -18,22 +19,10 @@ public class Fan implements Serializable {
     @Id
     private String id;
 
-    @NotNull
-    @Field("full_name")
-    private String fullName;
+    @DBRef
+    @Field("user")
+    private User user;
 
-    @Field("email")
-    private String email;
-
-    @Field("phone")
-    private String phone;
-
-    @NotNull
-    @Field("password")
-    private String password;
-
-    @Field("picture_profile")
-    private String pictureProfile;
 
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -43,45 +32,6 @@ public class Fan implements Serializable {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public Fan fullName(String fullName) {
-        this.fullName = fullName;
-        return this;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Fan email(String email) {
-        this.email = email;
-        return this;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public Fan phone(String phone) {
-        this.phone = phone;
-        return this;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
 
@@ -108,25 +58,18 @@ public class Fan implements Serializable {
     public String toString() {
         return "Fan{" +
             "id=" + getId() +
-            ", fullName='" + getFullName() + "'" +
-            ", email='" + getEmail() + "'" +
-            ", phone='" + getPhone() + "'" +
+            ", fullName='" + user.getFirstName() + user.getLastName() + "'" +
+            ", email='" + user.getEmail() + "'" +
+            ", phone='" + user.getPhone() + "'" +
             "}";
     }
 
-    public String getPassword() {
-        return password;
+
+    public User getUser() {
+        return user;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPictureProfile() {
-        return pictureProfile;
-    }
-
-    public void setPictureProfile(String pictureProfile) {
-        this.pictureProfile = pictureProfile;
+    public void setUser(User user) {
+        this.user = user;
     }
 }
