@@ -24,7 +24,6 @@ public class Fan implements Serializable {
     private User user;
 
 
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
         return id;
@@ -56,13 +55,22 @@ public class Fan implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "Fan{" +
-            "id=" + getId() +
-            ", fullName='" + user.getFirstName() + user.getLastName() + "'" +
-            ", email='" + user.getEmail() + "'" +
-            ", phone='" + user.getPhone() + "'" +
-            "}";
+        String result = "";
+        if (user == null) {
+            result = "Fan{" + "id=" + getId() + " , user: NULL }";
+        } else {
+            result = "Fan{" +
+                "id=" + getId() +
+                ", fullName='" + user.getFirstName() + " " + user.getLastName() + "'" +
+                ", phone='" + user.getPhone() + "'" +
+                ", email='" + user.getEmail() + "'" +
+                ", country='" + user.getCountry() + "'" +
+                "}";
+        }
+        return result;
     }
+
+
 
 
     public User getUser() {

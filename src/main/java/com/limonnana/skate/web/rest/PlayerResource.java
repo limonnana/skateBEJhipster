@@ -1,9 +1,15 @@
 package com.limonnana.skate.web.rest;
 
 import com.limonnana.skate.domain.Player;
+import com.limonnana.skate.domain.User;
 import com.limonnana.skate.repository.PlayerRepository;
+import com.limonnana.skate.repository.UserRepository;
+import com.limonnana.skate.service.UserService;
+import com.limonnana.skate.service.dto.UserDTO;
 import com.limonnana.skate.web.rest.errors.BadRequestAlertException;
 
+import com.limonnana.skate.web.rest.errors.LoginAlreadyUsedException;
+import com.limonnana.skate.web.rest.errors.PhoneAlreadyUsedException;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
@@ -33,9 +39,15 @@ public class PlayerResource {
     private String applicationName;
 
     private final PlayerRepository playerRepository;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
-    public PlayerResource(PlayerRepository playerRepository) {
+
+
+    public PlayerResource(PlayerRepository playerRepository, UserService userService, UserRepository userRepository) {
         this.playerRepository = playerRepository;
+        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -46,12 +58,31 @@ public class PlayerResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/players")
-    public ResponseEntity<Player> createPlayer(@Valid @RequestBody Player player) throws URISyntaxException {
-        log.debug("REST request to save Player : {}", player);
-        if (player.getId() != null) {
+    public ResponseEntity<Player> createPlayer(@Valid @RequestBody UserDTO userDTO) throws URISyntaxException {
+        log.debug("REST request to save Player : {}", userDTO);
+        if (userDTO.getId() != null) {
             throw new BadRequestAlertException("A new player cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Player result = playerRepository.save(player);
+
+        User user = new User();
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setPhone(userDTO.getPhone());
+        user.setActivated(true);
+        user.setLogin(userDTO.getPhone());
+        user.setCountry(userDTO.getCountry());
+
+        if (userRepository.findOneByLogin(user.getLogin().toLowerCase()).isPresent()) {
+            throw new LoginAlreadyUsedException();
+
+        } else if (userRepository.findOneByLogin(user.getPhone()).isPresent()){
+            throw new PhoneAlreadyUsedException();
+        }
+
+        user = userService.registerUserFromContribution(user);
+        Player p = new Player();
+        p.setUser(user);
+        Player result = playerRepository.save(p);
         return ResponseEntity.created(new URI("/api/players/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId()))
             .body(result);
@@ -67,11 +98,18 @@ public class PlayerResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/players")
-    public ResponseEntity<Player> updatePlayer(@Valid @RequestBody Player player) throws URISyntaxException {
-        log.debug("REST request to update Player : {}", player);
-        if (player.getId() == null) {
+    public ResponseEntity<Player> updatePlayer(@Valid @RequestBody UserDTO userDTO) throws URISyntaxException {
+        log.debug("REST request to update Player : {}", userDTO);
+        if (userDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        User user = new User();
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setPhone(userDTO.getPhone());
+        user.setActivated(true);
+        user.setLogin(userDTO.getPhone());
+        user.setCountry(userDTO.getCountry());
         Player result = playerRepository.save(player);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, player.getId()))

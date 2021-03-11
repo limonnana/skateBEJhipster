@@ -7,6 +7,7 @@ import com.limonnana.skate.domain.User;
 import com.limonnana.skate.repository.FanRepository;
 import com.limonnana.skate.repository.TrickRepository;
 import com.limonnana.skate.repository.UserRepository;
+import com.limonnana.skate.service.dto.UserDTO;
 import com.limonnana.skate.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,31 +49,42 @@ public class FanResource {
     private final FanRepository fanRepository;
     private final TrickRepository trickRepository;
     private final UserRepository userRepository;
+    private final UserResource userResource;
+    private final PasswordEncoder passwordEncoder;
+
 
     public FanResource(
         FanRepository fanRepository,
         TrickRepository trickRepository,
-        UserRepository userRepository
+        UserRepository userRepository,
+        UserResource userResource,
+        PasswordEncoder passwordEncoder
     ) {
         this.fanRepository = fanRepository;
         this.trickRepository = trickRepository;
         this.userRepository = userRepository;
+        this.userResource = userResource;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
      * {@code POST  /fans} : Create a new fan.
      *
-     * @param fan the fan to create.
+     *
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new fan, or with status {@code 400 (Bad Request)} if the fan has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/fans")
-    public ResponseEntity<Fan> createFan(@Valid @RequestBody Fan fan) throws URISyntaxException {
-        log.debug("REST request to save Fan : {}", fan);
-        if (fan.getId() != null) {
-            throw new BadRequestAlertException("A new fan cannot already have an ID", ENTITY_NAME, "idexists");
-        }
-        Fan result = fanRepository.save(fan);
+    public ResponseEntity<Fan> createFan(@Valid @RequestBody UserDTO userDTO) throws URISyntaxException {
+        log.debug("REST request to save Fan : {}", userDTO);
+
+        User u = userResource.userDTOToUser(userDTO);
+        String encryptedPassword = passwordEncoder.encode("123456");
+        u.setPassword(encryptedPassword);
+        u = userRepository.save(u);
+        Fan result = new Fan();
+        result.setUser(u);
+        result = fanRepository.save(result);
         return ResponseEntity.created(new URI("/api/fans/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId()))
             .body(result);
@@ -79,16 +92,16 @@ public class FanResource {
 
 
     @PostMapping("/fans/contribution")
-    public ResponseEntity<Fan> createFanContribution(@Valid @RequestBody ContributionForm contributionForm) throws URISyntaxException {
+    public ResponseEntity<User> createContribution(@Valid @RequestBody ContributionForm contributionForm) throws URISyntaxException {
         log.debug("REST request to save Fan Contribution : {}", contributionForm);
 
-        Fan fan = new Fan();
+        User user = new User();
 
-        if(contributionForm.getFanId() != null){
-            fan = fanRepository.findById(contributionForm.getFanId()).get();
+        if(contributionForm.getUserId() != null){
+            user = userRepository.findById(contributionForm.getUserId()).get();
         }else{
-            User user = new User();
-            String fullName = contributionForm.getFanFullName().trim();
+
+            String fullName = contributionForm.getUserFullName().trim();
             int location = fullName.indexOf(" ");
             String firstName = fullName.substring(0, location);
             String lastName = fullName.substring(location + 1);
@@ -96,9 +109,10 @@ public class FanResource {
             user.setFirstName(firstName);
             user.setLastName(lastName);
             user.setPhone(contributionForm.getPhone());
-            user = userRepository.save(user);
-            fan.setUser(user);
-            fan = fanRepository.save(fan);
+            String encryptedPassword = passwordEncoder.encode("123456");
+            user.setPassword(encryptedPassword);
+            user.setActivated(true);
+            userRepository.save(user);
         }
 
         Trick trick = trickRepository.findById(contributionForm.getTrick().getId()).get();
@@ -110,9 +124,9 @@ public class FanResource {
         trickRepository.save(trick);
 
 
-        return ResponseEntity.created(new URI("/api/fans/" + fan.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, fan.getId()))
-            .body(fan);
+        return ResponseEntity.created(new URI("/api/fans/" + user.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, user.getId()))
+            .body(user);
     }
 
     /**

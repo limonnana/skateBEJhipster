@@ -8,8 +8,8 @@ public class ContributionForm implements Serializable {
 
     private String amount;
     private Trick trick;
-    private String fanId;
-    private String fanFullName;
+    private String userId;
+    private String userFullName;
     private String phone;
 
     public String getAmount() {
@@ -18,22 +18,6 @@ public class ContributionForm implements Serializable {
 
     public void setAmount(String amount) {
         this.amount = amount;
-    }
-
-    public String getFanId() {
-        return fanId;
-    }
-
-    public void setFanId(String fanId) {
-        this.fanId = fanId;
-    }
-
-    public String getFanFullName() {
-        return fanFullName;
-    }
-
-    public void setFanFullName(String fanFullName) {
-        this.fanFullName = fanFullName;
     }
 
     public String getPhone() {
@@ -50,5 +34,21 @@ public class ContributionForm implements Serializable {
 
     public void setTrick(Trick trick) {
         this.trick = trick;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserFullName() {
+        return userFullName;
+    }
+
+    public void setUserFullName(String userFullName) {
+        this.userFullName = userFullName;
     }
 }

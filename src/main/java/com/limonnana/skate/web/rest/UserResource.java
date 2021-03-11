@@ -1,11 +1,15 @@
 package com.limonnana.skate.web.rest;
 
 import com.limonnana.skate.config.Constants;
+import com.limonnana.skate.domain.ContributionForm;
+import com.limonnana.skate.domain.Trick;
 import com.limonnana.skate.domain.User;
+import com.limonnana.skate.repository.TrickRepository;
 import com.limonnana.skate.repository.UserRepository;
 import com.limonnana.skate.security.AuthoritiesConstants;
 import com.limonnana.skate.service.MailService;
 import com.limonnana.skate.service.dto.PictureDTO;
+import com.limonnana.skate.web.rest.errors.PhoneAlreadyUsedException;
 import org.springframework.data.domain.Sort;
 import java.util.Collections;
 import com.limonnana.skate.service.UserService;
@@ -73,12 +77,15 @@ public class UserResource {
 
     private final UserRepository userRepository;
 
+    private final TrickRepository trickRepository;
+
     private final MailService mailService;
 
-    public UserResource(UserService userService, UserRepository userRepository, MailService mailService) {
+    public UserResource(TrickRepository trickRepository, UserService userService, UserRepository userRepository, MailService mailService) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.mailService = mailService;
+        this.trickRepository = trickRepository;
     }
 
     /**
@@ -142,7 +149,7 @@ public class UserResource {
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserDTO userDTO) {
         log.debug("REST request to update User : {}", userDTO);
-        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
+        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getPhone());
         if (existingUser.isPresent() && (!existingUser.get().getId().equals(userDTO.getId()))) {
             throw new EmailAlreadyUsedException();
         }
@@ -213,5 +220,59 @@ public class UserResource {
         log.debug("REST request to delete User: {}", login);
         userService.deleteUser(login);
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName,  "A user is deleted with identifier " + login, login)).build();
+    }
+
+    @PostMapping("/users/contribution")
+    public ResponseEntity<User> createContribution(@Valid @RequestBody ContributionForm contributionForm) throws URISyntaxException {
+        log.debug("REST request to save Contribution : {}", contributionForm);
+
+        User user = new User();
+
+        if(contributionForm.getUserId() != null){
+            user = userRepository.findById(contributionForm.getUserId()).get();
+        }else{
+
+            String fullName = contributionForm.getUserFullName().trim();
+            int location = fullName.indexOf(" ");
+            String firstName = fullName.substring(0, location);
+            String lastName = fullName.substring(location + 1);
+            user.setLogin(contributionForm.getPhone());
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setPhone(contributionForm.getPhone());
+            user.setActivated(true);
+
+            if (userRepository.findOneByLogin(user.getLogin().toLowerCase()).isPresent()) {
+                throw new LoginAlreadyUsedException();
+
+            } else if (userRepository.findOneByLogin(user.getPhone()).isPresent()){
+                throw new PhoneAlreadyUsedException();
+            }
+
+            user = userService.registerUserFromContribution(user);
+        }
+
+        Trick trick = trickRepository.findById(contributionForm.getTrick().getId()).get();
+        int ca = trick.getCurrentAmount().intValue();
+        String amount = contributionForm.getAmount();
+        int toAdd = Integer.parseInt(amount);
+        int amountTotal =  ca + toAdd;
+        trick.setCurrentAmount(amountTotal);
+        trickRepository.save(trick);
+
+
+        return ResponseEntity.created(new URI("/api/users/" + user.getLogin()))
+            .headers(HeaderUtil.createAlert(applicationName,  "A user is created with identifier " + user.getLogin(), user.getLogin()))
+            .body(user);
+    }
+
+    public User userDTOToUser(UserDTO userDTO){
+        User user = new User();
+        user.setLogin(userDTO.getPhone());
+        user.setPhone(userDTO.getPhone());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
+        return user;
     }
 }

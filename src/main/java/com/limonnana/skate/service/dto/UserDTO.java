@@ -18,6 +18,8 @@ public class UserDTO {
 
     private String id;
 
+    private String userId;
+
     @NotBlank
     @Pattern(regexp = Constants.LOGIN_REGEX)
     @Size(min = 1, max = 50)
@@ -31,6 +33,10 @@ public class UserDTO {
 
     @Size(min = 9, max = 13)
     private String phone;
+
+    @Size(max = 30)
+    @Field("country")
+    private String country;
 
     @Email
     @Size(max = 254)
@@ -66,6 +72,7 @@ public class UserDTO {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.phone = user.getPhone();
+        this.country = user.getCountry();
         this.email = user.getEmail();
         this.activated = user.getActivated();
         this.imageUrl = user.getImageUrl();
@@ -219,5 +226,21 @@ public class UserDTO {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

@@ -52,6 +52,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Field("phone")
     private String phone;
 
+    @Size(max = 30)
+    @Field("country")
+    private String country;
+
     @Email
     @Size(max = 254)
     @Indexed
@@ -217,6 +221,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
             ", lastName='" + lastName + '\'' +
             ", phone='" + phone + '\'' +
             ", email='" + email + '\'' +
+            ", country='" + country + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
             ", activated='" + activated + '\'' +
             ", langKey='" + langKey + '\'' +
@@ -238,5 +243,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 }
