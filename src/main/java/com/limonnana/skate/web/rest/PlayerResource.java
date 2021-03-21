@@ -103,16 +103,19 @@ public class PlayerResource {
         if (userDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        User user = new User();
+        Player player = playerRepository.findById(userDTO.getId()).get();
+        User user = player.getUser();
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setPhone(userDTO.getPhone());
         user.setActivated(true);
         user.setLogin(userDTO.getPhone());
         user.setCountry(userDTO.getCountry());
+        userRepository.save(user);
+        player.setUser(user);
         Player result = playerRepository.save(player);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, player.getId()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, result.getId()))
             .body(result);
     }
 

@@ -48,6 +48,7 @@ public class UserDTO {
     private String picture;
 
     private boolean activated = false;
+    private boolean player = false;
 
     @Size(min = 2, max = 10)
     private String langKey;
@@ -74,6 +75,7 @@ public class UserDTO {
         this.phone = user.getPhone();
         this.country = user.getCountry();
         this.email = user.getEmail();
+        this.player = user.isPlayer();
         this.activated = user.getActivated();
         this.imageUrl = user.getImageUrl();
         this.langKey = user.getLangKey();
@@ -201,6 +203,7 @@ public class UserDTO {
             ", phone='" + phone + '\'' +
             ", email='" + email + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
+            ", player='" + player +
             ", activated=" + activated +
             ", langKey='" + langKey + '\'' +
             ", picture='" + picture + '\'' +
@@ -242,5 +245,12 @@ public class UserDTO {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+    public boolean isPlayer() {
+        return player;
+    }
+
+    public void setPlayer(boolean player) {
+        this.player = player;
     }
 }

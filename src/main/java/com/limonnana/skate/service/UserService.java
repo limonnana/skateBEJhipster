@@ -2,8 +2,10 @@ package com.limonnana.skate.service;
 
 import com.limonnana.skate.config.Constants;
 import com.limonnana.skate.domain.Authority;
+import com.limonnana.skate.domain.Player;
 import com.limonnana.skate.domain.User;
 import com.limonnana.skate.repository.AuthorityRepository;
+import com.limonnana.skate.repository.PlayerRepository;
 import com.limonnana.skate.repository.UserRepository;
 import com.limonnana.skate.security.AuthoritiesConstants;
 import com.limonnana.skate.security.SecurityUtils;
@@ -35,14 +37,17 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final PlayerRepository playerRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private final AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository) {
+    public UserService(PlayerRepository playerRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
+        this.playerRepository = playerRepository;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -100,8 +105,11 @@ public class UserService {
         user.setLogin(user.getPhone());
         // new user gets initially a generic password and email
         user.setPassword(encryptedPassword);
-        user.setEmail("user@localhost");
-
+        user.setActivated(true);
+        user.setPlayer(false);
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+        user.setAuthorities(authorities);
         userRepository.save(user);
         log.debug("Created Information for User: {}", user);
         return user;
@@ -115,12 +123,15 @@ public class UserService {
                 throw new UsernameAlreadyUsedException();
             }
         });
+        /*
         userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).ifPresent(existingUser -> {
             boolean removed = removeNonActivatedUser(existingUser);
             if (!removed) {
                 throw new EmailAlreadyUsedException();
             }
         });
+
+         */
         User newUser = new User();
         String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(userDTO.getLogin().toLowerCase());
@@ -135,7 +146,8 @@ public class UserService {
         newUser.setImageUrl(userDTO.getImageUrl());
         newUser.setLangKey(userDTO.getLangKey());
         // new user is not active
-        newUser.setActivated(false);
+        newUser.setActivated(true);
+        newUser.setPlayer(false);
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
         Set<Authority> authorities = new HashSet<>();
@@ -173,6 +185,7 @@ public class UserService {
         user.setResetKey(RandomUtil.generateResetKey());
         user.setResetDate(Instant.now());
         user.setActivated(true);
+        user.setPlayer(false);
         user.setCountry(userDTO.getCountry());
         if (userDTO.getAuthorities() != null) {
             Set<Authority> authorities = userDTO.getAuthorities().stream()
@@ -202,6 +215,7 @@ public class UserService {
                 user.setLogin(userDTO.getLogin().toLowerCase());
                 user.setFirstName(userDTO.getFirstName());
                 user.setLastName(userDTO.getLastName());
+                user.setPhone((userDTO.getPhone()));
                 user.setCountry((userDTO.getCountry()));
                 if (userDTO.getEmail() != null) {
                     user.setEmail(userDTO.getEmail().toLowerCase());
@@ -216,6 +230,12 @@ public class UserService {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .forEach(managedAuthorities::add);
+                if(userDTO.isPlayer() == true &&  user.isPlayer() == false){
+                    user.setPlayer(userDTO.isPlayer());
+                    Player p = new Player();
+                    p.setUser(user);
+                    playerRepository.save(p);
+                }
                 userRepository.save(user);
                 log.debug("Changed Information for User: {}", user);
                 return user;
