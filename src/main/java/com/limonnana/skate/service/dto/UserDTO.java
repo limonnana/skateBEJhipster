@@ -47,6 +47,8 @@ public class UserDTO {
 
     private String picture;
 
+    private String profilePicture;
+
     private boolean activated = false;
     private boolean player = false;
 
@@ -74,6 +76,8 @@ public class UserDTO {
         this.lastName = user.getLastName();
         this.phone = user.getPhone();
         this.country = user.getCountry();
+        this.picture = user.getPicture();
+        this.profilePicture = user.getProfilePicture();
         this.email = user.getEmail();
         this.player = user.isPlayer();
         this.activated = user.getActivated();
@@ -252,5 +256,13 @@ public class UserDTO {
 
     public void setPlayer(boolean player) {
         this.player = player;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 }

@@ -40,9 +40,6 @@ public class Event implements Serializable {
     @Field("player")
     private Set<Player> players = new HashSet<>();
 
-    @DBRef
-    @Field("fan")
-    private Set<Fan> fans = new HashSet<>();
 
     @DBRef
     @Field("spot")
@@ -149,28 +146,6 @@ public class Event implements Serializable {
         this.players = players;
     }
 
-    public Set<Fan> getFans() {
-        return fans;
-    }
-
-    public Event fans(Set<Fan> fans) {
-        this.fans = fans;
-        return this;
-    }
-
-    public Event addFan(Fan fan) {
-        this.fans.add(fan);
-        return this;
-    }
-
-    public Event removeFan(Fan fan) {
-        this.fans.remove(fan);
-        return this;
-    }
-
-    public void setFans(Set<Fan> fans) {
-        this.fans = fans;
-    }
 
     public Spot getSpot() {
         return spot;

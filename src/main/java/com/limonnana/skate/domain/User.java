@@ -63,6 +63,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private boolean activated = false;
     private boolean player = false;
 
+    @Field("profilePicture")
+    private String profilePicture;
+
     @Field("picture")
     private String picture;
 
@@ -260,5 +263,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     public void setPlayer(boolean player) {
         this.player = player;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 }

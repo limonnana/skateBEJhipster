@@ -1,6 +1,8 @@
 package com.limonnana.skate.web.rest;
 
+import com.limonnana.skate.domain.Event;
 import com.limonnana.skate.domain.Trick;
+import com.limonnana.skate.repository.EventRepository;
 import com.limonnana.skate.repository.TrickRepository;
 import com.limonnana.skate.web.rest.errors.BadRequestAlertException;
 
@@ -41,8 +43,14 @@ public class TrickResource {
 
     private final TrickRepository trickRepository;
 
-    public TrickResource(TrickRepository trickRepository) {
+    private final EventResource eventResource;
+
+    private final EventRepository eventRepository;
+
+    public TrickResource(TrickRepository trickRepository, EventResource eventResource, EventRepository eventRepository) {
         this.trickRepository = trickRepository;
+        this.eventResource = eventResource;
+        this.eventRepository = eventRepository;
     }
 
     /**
@@ -53,12 +61,16 @@ public class TrickResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/tricks")
-    public ResponseEntity<Trick> createTrick(@Valid @RequestBody Trick trick) throws URISyntaxException {
+    public ResponseEntity<Trick> createTrick(@Valid @RequestBody Trick trick) throws Exception {
         log.debug("REST request to save Trick : {}", trick);
         if (trick.getId() != null) {
             throw new BadRequestAlertException("A new trick cannot already have an ID", ENTITY_NAME, "idexists");
         }
         Trick result = trickRepository.save(trick);
+        Iterable<Event> activeIterable = eventRepository.findByActiveTrue();
+        Event active = activeIterable.iterator().next();
+        active.getTricks().add(result);
+        eventRepository.save(active);
         return ResponseEntity.created(new URI("/api/tricks/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId()))
             .body(result);

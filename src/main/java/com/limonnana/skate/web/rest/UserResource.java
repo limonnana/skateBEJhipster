@@ -121,7 +121,7 @@ public class UserResource {
     }
 
     @PostMapping("/users/picture")
-    public ResponseEntity<User> addProfilePicture(@Valid @RequestBody PictureDTO pictureDTO){
+    public ResponseEntity<User> addPicture(@Valid @RequestBody PictureDTO pictureDTO){
 
         User user = userRepository.findOneByLogin(pictureDTO.getLogin().toLowerCase()).get();
 
@@ -134,6 +134,22 @@ public class UserResource {
         return ResponseUtil.wrapOrNotFound(Optional.of(user),
             HeaderUtil.createAlert(applicationName, "Picture has been updated", user.getLogin()));
     }
+
+    @PostMapping("/users/profilepicture")
+    public ResponseEntity<User> addProfilePicture(@Valid @RequestBody PictureDTO pictureDTO){
+
+        User user = userRepository.findOneByLogin(pictureDTO.getLogin().toLowerCase()).get();
+
+        if(user == null){
+            throw new BadRequestAlertException(" user with that login doesn't exist ", "UserNULL", "UserNULL");
+        }
+        user.setProfilePicture(pictureDTO.getPicture());
+        user = userRepository.save(user);
+
+        return ResponseUtil.wrapOrNotFound(Optional.of(user),
+            HeaderUtil.createAlert(applicationName, "Profile Picture has been updated", user.getLogin()));
+    }
+
 
 
     /**
