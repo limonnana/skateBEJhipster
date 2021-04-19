@@ -2,6 +2,7 @@ package com.limonnana.skate.web.rest;
 
 import com.limonnana.skate.config.Constants;
 import com.limonnana.skate.domain.ContributionForm;
+import com.limonnana.skate.domain.Seccion;
 import com.limonnana.skate.domain.Trick;
 import com.limonnana.skate.domain.User;
 import com.limonnana.skate.repository.TrickRepository;
@@ -9,7 +10,6 @@ import com.limonnana.skate.repository.UserRepository;
 import com.limonnana.skate.security.AuthoritiesConstants;
 import com.limonnana.skate.service.MailService;
 import com.limonnana.skate.service.dto.PictureDTO;
-import com.limonnana.skate.web.rest.errors.PhoneAlreadyUsedException;
 import org.springframework.data.domain.Sort;
 import java.util.Collections;
 import com.limonnana.skate.service.UserService;
@@ -245,7 +245,13 @@ public class UserResource {
 
         if(contributionForm.getUserId() != null){
             user = userRepository.findById(contributionForm.getUserId()).get();
-        }else{
+        }else if (userRepository.findOneByLogin(user.getLogin().toLowerCase()).isPresent()) {
+                user = userRepository.findOneByLogin(user.getLogin().toLowerCase()).get();
+
+        } else if (userRepository.findOneByLogin(user.getPhone()).isPresent()){
+                user = userRepository.findOneByLogin(user.getPhone()).get();
+        }
+        else{
 
             String fullName = contributionForm.getUserFullName().trim();
             int location = fullName.indexOf(" ");
@@ -257,24 +263,20 @@ public class UserResource {
             user.setPhone(contributionForm.getPhone());
             user.setActivated(true);
 
-            if (userRepository.findOneByLogin(user.getLogin().toLowerCase()).isPresent()) {
-                throw new LoginAlreadyUsedException();
-
-            } else if (userRepository.findOneByLogin(user.getPhone()).isPresent()){
-                throw new PhoneAlreadyUsedException();
-            }
-
             user = userService.registerUserFromContribution(user);
         }
 
         Trick trick = trickRepository.findById(contributionForm.getTrick().getId()).get();
-        int ca = trick.getCurrentAmount().intValue();
+        Seccion seccion = new Seccion();
+        seccion.setUser(user);
         String amount = contributionForm.getAmount();
-        int toAdd = Integer.parseInt(amount);
-        int amountTotal =  ca + toAdd;
-        trick.setCurrentAmount(amountTotal);
+        int shekel = Integer.parseInt(amount);
+        seccion.setShekel(shekel);
+        seccion.setPorcentaje(calculatePorcentage(shekel, trick.getObjectiveAmount()));
+        trick.getSecciones().add(seccion);
+        int ca = calculateCurrentAmount(trick.getSecciones());
+        trick.setCurrentAmount(ca);
         trickRepository.save(trick);
-
 
         return ResponseEntity.created(new URI("/api/users/" + user.getLogin()))
             .headers(HeaderUtil.createAlert(applicationName,  "A user is created with identifier " + user.getLogin(), user.getLogin()))
@@ -289,5 +291,19 @@ public class UserResource {
         user.setLastName(userDTO.getLastName());
         user.setEmail(userDTO.getEmail());
         return user;
+    }
+
+    private int calculatePorcentage(int shekel, int objectiveAmount){
+        int result = (shekel / objectiveAmount) * 100;
+        return result;
+    }
+
+    private int calculateCurrentAmount(Set<Seccion> secciones){
+        int result = 0;
+
+        for(Seccion s : secciones){
+            result = result + s.getShekel();
+        }
+        return result;
     }
 }

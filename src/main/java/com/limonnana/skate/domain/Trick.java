@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Trick.
@@ -27,6 +29,9 @@ public class Trick implements Serializable {
 
     @Field("current_amount")
     private Integer currentAmount = 0;
+
+    @Field("secciones")
+    private Set<Seccion> secciones = new HashSet<Seccion>() ;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -102,5 +107,13 @@ public class Trick implements Serializable {
             ", objectiveAmount=" + getObjectiveAmount() +
             ", currentAmount=" + getCurrentAmount() +
             "}";
+    }
+
+    public Set<Seccion> getSecciones() {
+        return secciones;
+    }
+
+    public void setSecciones(Set<Seccion> secciones) {
+        this.secciones = secciones;
     }
 }
