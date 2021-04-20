@@ -5,6 +5,7 @@ import com.limonnana.skate.domain.ContributionForm;
 import com.limonnana.skate.domain.Seccion;
 import com.limonnana.skate.domain.Trick;
 import com.limonnana.skate.domain.User;
+import com.limonnana.skate.repository.SeccionRepository;
 import com.limonnana.skate.repository.TrickRepository;
 import com.limonnana.skate.repository.UserRepository;
 import com.limonnana.skate.security.AuthoritiesConstants;
@@ -81,11 +82,18 @@ public class UserResource {
 
     private final MailService mailService;
 
-    public UserResource(TrickRepository trickRepository, UserService userService, UserRepository userRepository, MailService mailService) {
+    private final SeccionRepository seccionRepository;
+
+    public UserResource(TrickRepository trickRepository,
+                        UserService userService,
+                        UserRepository userRepository,
+                        MailService mailService,
+                        SeccionRepository seccionRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.mailService = mailService;
         this.trickRepository = trickRepository;
+        this.seccionRepository = seccionRepository;
     }
 
     /**
@@ -243,15 +251,13 @@ public class UserResource {
 
         User user = new User();
 
-        if(contributionForm.getUserId() != null){
-            user = userRepository.findById(contributionForm.getUserId()).get();
-        }else if (userRepository.findOneByLogin(user.getLogin().toLowerCase()).isPresent()) {
-                user = userRepository.findOneByLogin(user.getLogin().toLowerCase()).get();
-
-        } else if (userRepository.findOneByLogin(user.getPhone()).isPresent()){
-                user = userRepository.findOneByLogin(user.getPhone()).get();
+        if(contributionForm.getPhone() != null){
+            user = userRepository.findOneByLogin(contributionForm.getPhone()).get();
+            if(user == null){
+                user = userRepository.findOneByPhone(contributionForm.getPhone()).get();
+            }
         }
-        else{
+        if(user == null){
 
             String fullName = contributionForm.getUserFullName().trim();
             int location = fullName.indexOf(" ");
@@ -275,11 +281,18 @@ public class UserResource {
         seccion.setPorcentaje(calculatePorcentage(shekel, trick.getObjectiveAmount()));
         trick.getSecciones().add(seccion);
         int ca = calculateCurrentAmount(trick.getSecciones());
+
+        if(ca > trick.getObjectiveAmount()){
+            trick.setObjectiveAmount(ca);
+            trick = resetTrickQuantities(trick);
+            }
         trick.setCurrentAmount(ca);
+        seccion = seccionRepository.save(seccion);
+        trick.getSecciones().add(seccion);
         trickRepository.save(trick);
 
         return ResponseEntity.created(new URI("/api/users/" + user.getLogin()))
-            .headers(HeaderUtil.createAlert(applicationName,  "A user is created with identifier " + user.getLogin(), user.getLogin()))
+            .headers(HeaderUtil.createAlert(applicationName,  "A Tip is created with identifier " + seccion.getId(), seccion.getId()))
             .body(user);
     }
 
@@ -294,8 +307,10 @@ public class UserResource {
     }
 
     private int calculatePorcentage(int shekel, int objectiveAmount){
-        int result = (shekel / objectiveAmount) * 100;
-        return result;
+        float shekelF = shekel;
+        float objectiveAmountF = objectiveAmount;
+        float result = (shekelF / objectiveAmountF) * 100;
+        return (int)result;
     }
 
     private int calculateCurrentAmount(Set<Seccion> secciones){
@@ -305,5 +320,15 @@ public class UserResource {
             result = result + s.getShekel();
         }
         return result;
+    }
+
+    private Trick resetTrickQuantities(Trick trick){
+
+        for(Seccion s : trick.getSecciones()){
+            int newPorcentaje = calculatePorcentage(s.getShekel(), trick.getObjectiveAmount());
+            s.setPorcentaje(newPorcentaje);
+            seccionRepository.save(s);
+        }
+        return trick;
     }
 }
