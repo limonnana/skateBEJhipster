@@ -30,6 +30,12 @@ public class Trick implements Serializable {
     @Field("current_amount")
     private Integer currentAmount = 0;
 
+    @Field("percentage_covered")
+    private Integer percentageCovered;
+
+    @Field("percentage_to_go")
+    private Integer percentageToGo;
+
     @Field("secciones")
     private Set<Seccion> secciones = new HashSet<Seccion>() ;
 
@@ -115,5 +121,21 @@ public class Trick implements Serializable {
 
     public void setSecciones(Set<Seccion> secciones) {
         this.secciones = secciones;
+    }
+
+    public Integer getPercentageCovered() {
+        return percentageCovered;
+    }
+
+    public void setPercentageCovered(Integer percentageCovered) {
+        this.percentageCovered = percentageCovered;
+    }
+
+    public Integer getPercentageToGo() {
+        return percentageToGo;
+    }
+
+    public void setPercentageToGo(Integer percentageToGo) {
+        this.percentageToGo = percentageToGo;
     }
 }

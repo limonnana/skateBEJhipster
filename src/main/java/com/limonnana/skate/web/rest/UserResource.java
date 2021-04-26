@@ -287,6 +287,7 @@ public class UserResource {
             trick = resetTrickQuantities(trick);
             }
         trick.setCurrentAmount(ca);
+        trick = setTotalPercentages(trick);
         seccion = seccionRepository.save(seccion);
         trick.getSecciones().add(seccion);
         trickRepository.save(trick);
@@ -311,6 +312,20 @@ public class UserResource {
         float objectiveAmountF = objectiveAmount;
         float result = (shekelF / objectiveAmountF) * 100;
         return (int)result;
+    }
+
+    private Trick setTotalPercentages(Trick trick){
+
+        float ca = calculateCurrentAmount(trick.getSecciones());
+        float finalAmount = trick.getObjectiveAmount().intValue();
+        float toGo = finalAmount - ca;
+        float percentageDone = (ca / finalAmount) * 100;
+        float percentageToGo = 100 - percentageDone;
+        int pd = Math.round(percentageDone);
+        int ptg = Math.round(percentageToGo);
+        trick.setPercentageCovered(pd);
+        trick.setPercentageToGo(ptg);
+        return trick;
     }
 
     private int calculateCurrentAmount(Set<Seccion> secciones){
