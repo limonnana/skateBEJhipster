@@ -16,6 +16,7 @@ public class Seccion {
     @Field("porcentaje")
     private int porcentaje;
 
+
     @Field("shekel")
     private int shekel;
 
@@ -50,4 +51,6 @@ public class Seccion {
     public void setShekel(int shekel) {
         this.shekel = shekel;
     }
+
+
 }
