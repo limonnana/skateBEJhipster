@@ -5,7 +5,7 @@
 
     <groupId>com.limonnana.skate</groupId>
     <artifactId>skate-03</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.9</version>
     <packaging>jar</packaging>
     <name>Skate 03</name>
 

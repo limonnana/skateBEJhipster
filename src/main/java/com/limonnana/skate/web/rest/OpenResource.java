@@ -1,7 +1,9 @@
 package com.limonnana.skate.web.rest;
 
 import com.limonnana.skate.domain.Event;
+import com.limonnana.skate.domain.Player;
 import com.limonnana.skate.repository.EventRepository;
+import com.limonnana.skate.repository.PlayerRepository;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +20,16 @@ import java.util.Optional;
 public class OpenResource {
 
     private final EventRepository eventRepository;
+    private  final PlayerRepository playerRepository;
     private final Logger log = LoggerFactory.getLogger(OpenResource.class);
 
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
-    public OpenResource( EventRepository eventRepository){
+    public OpenResource(EventRepository eventRepository, PlayerRepository playerRepository){
         this.eventRepository = eventRepository;
+        this.playerRepository = playerRepository;
     }
 
     @GetMapping("/event/active")
@@ -43,6 +47,13 @@ public class OpenResource {
             }
         }
         return ResponseUtil.wrapOrNotFound(Optional.of(result));
+    }
+
+    @GetMapping("/player/{id}")
+    public ResponseEntity<Player> getPlayer(@PathVariable String id) throws Exception {
+        log.debug("REST request to get Player : {}", id);
+        Optional<Player> player = playerRepository.findById(id);
+        return ResponseUtil.wrapOrNotFound(player);
     }
 
 
